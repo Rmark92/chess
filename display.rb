@@ -1,12 +1,12 @@
 require "colorize"
-require_relative "board"
+#require_relative "board"
 require_relative "cursor"
 
 class Display
   attr_reader :board, :cursor
-  def initialize(board)
+  def initialize(board, cursor=nil)
     @board = board
-    @cursor = Cursor.new([0,0], board)
+    @cursor = cursor || Cursor.new(board, :w)
   end
 
   # def display
@@ -21,7 +21,9 @@ class Display
 
     @board.grid.each.with_index do |row, i|
       row.each.with_index do |piece, j|
-        if [i, j] == [x, y]
+        if cursor.selected_pos == [i, j]
+          print piece.to_s.colorize(:green)
+        elsif [i, j] == [x, y]
           print piece.to_s.colorize(:red)
         else
           print piece

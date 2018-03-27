@@ -1,5 +1,6 @@
 require "io/console"
 require "colorize"
+require 'byebug'
 
 KEYMAP = {
   " " => :space,
@@ -33,15 +34,19 @@ MOVES = {
 
 class Cursor
 
-  attr_reader :cursor_pos, :board
+  attr_reader :cursor_pos, :board, :color
+  attr_accessor :selected_pos
 
-  def initialize(cursor_pos, board)
-    @cursor_pos = cursor_pos
+  def initialize(board, color)
+    @cursor_pos = (color == :w ? [7, 0] : [0, 0])
     @board = board
+    @selected_pos = nil
+    @color = color
   end
 
   def get_input
     key = KEYMAP[read_char]
+    #debugger
     handle_key(key)
   end
 
@@ -78,15 +83,36 @@ class Cursor
 
   #The customer is always an ninkompoop. And it's all about him.
   def handle_key(key)
-    input = KEYMAP[key]
-    case input
+    case key
     when :return, :space
-      cursor_pos
+      register_selection
     when :left, :right, :up, :down
-      update_pos(MOVES[input])
+      update_pos(MOVES[key])
       nil
     when :ctrl_c
        Process.exit(0)
+    end
+  end
+
+  def register_selection
+    if valid_piece? || self.selected_pos
+      toggle_selected
+      cursor_pos
+    else
+      nil
+    end
+  end
+
+  def valid_piece?
+    board[cursor_pos].color == color
+  end
+
+  #debuggle
+  def toggle_selected
+    if selected_pos == cursor_pos
+      self.selected_pos = nil
+    elsif selected_pos.nil?
+      self.selected_pos = cursor_pos
     end
   end
 
@@ -94,6 +120,6 @@ class Cursor
   def update_pos(diff)
     new_pos_x = cursor_pos[0]+diff[0]
     new_pos_y = cursor_pos[1]+diff[1]
-    @cursor_pos = [new_pos_x, new_pos_y]
+    @cursor_pos = [new_pos_x, new_pos_y] if board.in_range?([new_pos_x, new_pos_y])
   end
 end

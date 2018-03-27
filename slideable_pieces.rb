@@ -1,6 +1,45 @@
 require_relative "piece"
+require 'byebug'
+
+module Slideable
+  def moves
+    #debugger
+    result = []
+    self.class::OFFSETS.each do |offset|
+      multiplier = 0
+      loop do
+        multiplier += 1
+        new_position = calculate_position(offset, multiplier)
+        if !board.in_range?(new_position)
+          break
+        elsif board[new_position].instance_of?(NullPiece)
+          result << new_position
+        elsif board[new_position].color == self.color
+          break
+        else
+          result << new_position
+          break
+        end
+      end
+    end
+    result
+  end
+
+  def calculate_position(offset, multiplier)
+    [offset[0] * multiplier + position[0],
+     offset[1] * multiplier + position[1]]
+  end
+
+  HORIZONTAL = [[0,1], [0, -1]]
+  VERTICAL = [[1, 0], [-1, 0]]
+  DIAGONAL =  [[1,1], [-1, -1], [1, -1], [-1, 1]]
+end
 
 class Rook < Piece
+  include Slideable
+
+  OFFSETS = Slideable::HORIZONTAL + Slideable::VERTICAL
+
   def symbol
     if color == :w
       "\u2656 "
@@ -11,6 +50,10 @@ class Rook < Piece
 end
 
 class Bishop < Piece
+  include Slideable
+
+  OFFSETS = Slideable::DIAGONAL
+
   def symbol
     if color == :w
       "\u2657 "
@@ -21,6 +64,9 @@ class Bishop < Piece
 end
 
 class Queen < Piece
+  include Slideable
+
+  OFFSETS = Slideable::HORIZONTAL + Slideable::VERTICAL + Slideable::DIAGONAL
   def symbol
     if color == :w
       "\u2655 "

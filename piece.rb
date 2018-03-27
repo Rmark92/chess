@@ -5,6 +5,7 @@ class Piece
     @board = board
     @color = color
     @position = position
+    @has_moved = false
   end
 
   def to_s
@@ -15,9 +16,17 @@ class Piece
   end
 
   def valid_moves
+    my_moves = moves
+    my_moves.select {|move| !move_into_check?(move)}
   end
 
-  def pos=(val)
+  def is_valid_move?(move)
+    board.in_range?(move) && !move_into_check(move)
+  end
+
+  def position=(new_pos)
+    @position = new_pos
+    @has_moved = true
   end
 
   # def symbol
@@ -27,8 +36,37 @@ class Piece
   private
 
   def move_into_check?(en_pos)
+    # debugger if [[1, 4], [1, 2], [2, 1], [3, 0]].include?(en_pos)
+    into_check = false
+    board.test_move(position, en_pos) do |tmp_brd|
+      into_check = tmp_brd.in_check?(self.color)
+    end
+    into_check
   end
+  #
+  # def move_into_check?(en_pos)
+  #   old_position = position
+  #   temp_move(en_pos)
+  #   return_val = board.in_check?(self.color)
+  #   undo_move(old_position)
+  #   return_val
+  # end
+  #
+  # def temp_move(new_pos)
+  #   board[position] = NullPiece.instance
+  #   board[new_pos] = self
+  # end
+  #
+  # def undo_move(old_pos)
+  #   board[position] = NullPiece.insance
+  #   board[old_pos] = self
+  # end
+
 end
+
+
+
+
 
 # String unicodeMessage =
 #                       "\u2654 " + // white king

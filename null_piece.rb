@@ -15,6 +15,7 @@ class NullPiece < Piece
   end
 
   def symbol
+    # "\u200A_"
     "_ "
   end
 
