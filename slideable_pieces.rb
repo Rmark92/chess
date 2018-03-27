@@ -2,10 +2,11 @@ require_relative "piece"
 require 'byebug'
 
 module Slideable
-  def moves
+  def slide_moves(offsets = nil)
+    offsets ||= self.class::OFFSETS
     #debugger
     result = []
-    self.class::OFFSETS.each do |offset|
+    offsets.each do |offset|
       multiplier = 0
       loop do
         multiplier += 1

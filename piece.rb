@@ -1,5 +1,6 @@
 class Piece
   attr_reader :board, :color, :position
+  attr_accessor :has_moved
 
   def initialize(color, board, position)
     @board = board
@@ -27,6 +28,14 @@ class Piece
   def position=(new_pos)
     @position = new_pos
     @has_moved = true
+  end
+
+  def moves
+    if self.respond_to?('slide_moves')
+      slide_moves
+    elsif self.respond_to?('step_moves')
+      step_moves
+    end
   end
 
   # def symbol
