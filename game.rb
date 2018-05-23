@@ -8,7 +8,7 @@ class Game
   def initialize
     @board = Board.new
     @player1 = HumanPlayer.new('Ryan', board, :w)
-    @player2 = HumanPlayer.new("Benji", board, :b)
+    @player2 = AIPlayer.new(board, :b)
     @current_player = player1
   end
 

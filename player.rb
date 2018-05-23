@@ -1,10 +1,9 @@
 require_relative "display"
 require_relative "cursor"
+require_relative "move_search"
 require 'byebug'
 
 class Player
-end
-class HumanPlayer < Player
   attr_reader :board, :color, :name
 
   def initialize(name, board, color)
@@ -12,6 +11,39 @@ class HumanPlayer < Player
     @color = color
     @name = name
   end
+end
+
+class AIPlayer < Player
+  def initialize(board, color)
+    super('BeepBoop', board, color)
+
+  end
+
+  def get_move
+    @move_search = MoveSearch.new(@board, self.color)
+    @move_search.find_best
+    # debugger
+    return @move_search.best
+  end
+  #
+  # def get_move
+  #   pieces = board.pieces(self.color)
+  #   pieces.each do |piece|
+  #     debugger
+  #     p piece.class
+  #     p piece.valid_moves
+  #   end
+  # end
+  #
+  # def alpha_beta(alpha, beta, depth = 2)
+  #
+  # end
+
+
+end
+
+class HumanPlayer < Player
+  attr_reader :board, :color, :name
 
   def get_move
     my_cursor = Cursor.new(board, color)

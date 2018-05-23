@@ -41,6 +41,11 @@ class Rook < Piece
 
   OFFSETS = Slideable::HORIZONTAL + Slideable::VERTICAL
 
+  def initialize(color, board, position)
+    @value = 100
+    super
+  end
+
   def symbol
     if color == :w
       "\u2656 "
@@ -55,6 +60,11 @@ class Bishop < Piece
 
   OFFSETS = Slideable::DIAGONAL
 
+  def initialize(color, board, position)
+    @value = 50
+    super
+  end
+
   def symbol
     if color == :w
       "\u2657 "
@@ -68,6 +78,12 @@ class Queen < Piece
   include Slideable
 
   OFFSETS = Slideable::HORIZONTAL + Slideable::VERTICAL + Slideable::DIAGONAL
+
+  def initialize(color, board, position)
+    @value = 200
+    super
+  end
+  
   def symbol
     if color == :w
       "\u2655 "

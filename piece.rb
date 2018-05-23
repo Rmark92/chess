@@ -1,5 +1,5 @@
 class Piece
-  attr_reader :board, :color, :position
+  attr_reader :board, :color, :position, :value
   attr_accessor :has_moved
 
   def initialize(color, board, position)
@@ -11,6 +11,11 @@ class Piece
 
   def to_s
     symbol
+  end
+
+  def abbrev_display
+    puts self.class
+    puts self.position
   end
 
   def empty?
@@ -27,7 +32,8 @@ class Piece
 
   def position=(new_pos)
     @position = new_pos
-    @has_moved = true
+    # debugger if self.instance_of?(King)
+    # @has_moved = true
   end
 
   def moves

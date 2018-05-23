@@ -70,14 +70,50 @@ class Board
     true
   end
 
+  def castle_rook(old_pos, new_pos)
+    if (new_pos[1] > old_pos[1])
+      rook_pos = [new_pos[0], 7]
+      self[rook_pos].has_moved = true
+      move(rook_pos, [new_pos[0], 5])
+    else
+      rook_pos = [new_pos[0], 0]
+      self[rook_pos].has_moved = true
+      move(rook_pos, [new_pos[0], 3])
+    end
+  end
+
+  def uncastle_rook(old_pos, new_pos)
+    if (new_pos[1] > old_pos[1])
+      rook_pos = [new_pos[0], 5]
+      self[rook_pos].has_moved = false
+      move(rook_pos, [new_pos[0], 7])
+    else
+      rook_pos = [new_pos[0], 3]
+      self[rook_pos].has_moved = false
+      move(rook_pos, [new_pos[0], 0])
+    end
+  end
+
   def move_piece(old_pos, new_pos)
     piece = self[old_pos]
     if piece.valid_moves.include?(new_pos)
+      castle_rook(old_pos, new_pos) if piece.instance_of?(King) &&
+                                       (old_pos[1] - new_pos[1]).abs > 1
       move(old_pos, new_pos)
+      piece.has_moved = true
     else
       raise InvalidMoveError, "Invalid position choice"
     end
   end
+
+  # def unmove_piece(old_pos, new_pos)
+  #   piece = self[new_pos]
+  #   uncastle_rook(old_pos, new_pos) if piece.instance_of?(King) &&
+  #                                      (old_pos[1] - new_pos[1]).abs > 1
+  #   move(new_pos, old_pos)
+  #   piece.has_move = false
+  # end
+
 
   def move(old_pos, new_pos)
     captured = self[new_pos]
@@ -88,10 +124,35 @@ class Board
   end
 
   def test_move(old_pos, new_pos, &prc)
+    piece = self[old_pos]
+    original_piece_moved = piece.has_moved
     captured = move(old_pos, new_pos)
+    # captured.position = nil unless captured.instance_of?(NullPiece)
+    castle_rook(old_pos, new_pos) if piece.instance_of?(King) &&
+                                     (old_pos[1] - new_pos[1]).abs > 1
     return_val = prc.call(self)
+    uncastle_rook(old_pos, new_pos) if piece.instance_of?(King) &&
+                                       (old_pos[1] - new_pos[1]).abs > 1
     move(new_pos, old_pos)
+    piece.has_moved = original_piece_moved
+    # debugger unless captured.instance_of?(NullPiece)
+    # captured.position = new_pos unless captured.instance_of?(NullPiece)
     self[new_pos] = captured
+  end
+
+  def pieces(color)
+    piece_arr = []
+    each { |piece| piece_arr <<  piece if piece.color == color }
+    piece_arr
+  end
+
+  def calculate_scores
+    scores = { w: 0, b: 0}
+    each do |square|
+      next unless scores[square.color]
+      scores[square.color] += square.value
+    end
+    scores
   end
 
   # def self.set_pieces
@@ -125,6 +186,12 @@ class Board
     end
     @grid[row].map!.with_index {|square, index| Pawn.new(color, self, [row, index])}
 
+  end
+
+  def abbrev_display
+    self.grid.map do |row|
+      row.map { |sq| sq.class }
+    end
   end
 
   def set_up_power_pieces(color)

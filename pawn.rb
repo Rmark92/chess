@@ -14,6 +14,7 @@ class Pawn < Piece
 
   def initialize(color, board, position)
     @starting_position = position
+    @value = 10
     super
   end
 

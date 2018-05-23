@@ -11,9 +11,6 @@ module Stepable
   end
 end
 
-
-
-
 class Knight < Piece
   include Stepable
   OFFSETS = [
@@ -26,6 +23,12 @@ class Knight < Piece
     [-1, 2],
     [-1, -2]
   ]
+
+  def initialize(color, board, position)
+    @value = 30
+    super
+  end
+
   def symbol
     if color == :w
       "\u2658 "
@@ -71,8 +74,13 @@ class King < Piece
   #   moves
   # end
 
+  def initialize(color, board, position)
+    @value = 1000
+    super
+  end
+
   def valid_moves
-    p valid_stepping_moves + valid_castle_moves
+    valid_stepping_moves + valid_castle_moves
   end
 
   def valid_stepping_moves
@@ -96,13 +104,13 @@ class King < Piece
   def valid_castle_moves
     sliding_moves_arr = sliding_moves
     castle_moves = []
-    right = board[position[0], 7]
+    right = board[[position[0], 7]]
     right_slide = sliding_moves_arr.select { |_, col| (5..6).include?(col) }
     if right.instance_of?(Rook) && !right.has_moved && right_slide.size == 2 && right_slide.none? {|move| move_into_check?(move)}
       castle_moves += [[position[0], 6]]
     end
 
-    left = board[position[0], 0]
+    left = board[[position[0], 0]]
     left_slide = sliding_moves_arr.select { |_, col| (2..3).include?(col) }
     if left.instance_of?(Rook) && !left.has_moved && left_slide.size == 2 && left_slide.none? {|move| move_into_check?(move)}
       castle_moves += [[position[0], 2]]
